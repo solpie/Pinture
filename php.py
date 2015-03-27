@@ -3,7 +3,6 @@
 
 import struct
 import imghdr
-import semidbm
 
 
 def get_image_size(fname):
@@ -70,64 +69,64 @@ from imapclient import IMAPClient
 # rc, self.response = self.M.login(username, password)
 # return rc
 #
-#     def logout(self):
-#         self.M.logout()
+# def logout(self):
+# self.M.logout()
 #
-#     def get_mailboxes(self):
-#         rc, self.response = self.M.list()
-#         for item in self.response:
-#             self.mailboxes.append(item.split()[-1])
-#         return rc
+# def get_mailboxes(self):
+# rc, self.response = self.M.list()
+# for item in self.response:
+# self.mailboxes.append(item.split()[-1])
+# return rc
 #
-#     def create_mailbox(self, mailbox):
-#         rc, self.response = self.M.create(mailbox)
-#         return rc
+# def create_mailbox(self, mailbox):
+# rc, self.response = self.M.create(mailbox)
+# return rc
 #
-#     def parse_uid(self, data):
-#         match = pattern_uid.match(data)
-#         return match.group('uid')
+# def parse_uid(self, data):
+# match = pattern_uid.match(data)
+# return match.group('uid')
 #
-#     def get_attachments(self, folder='Inbox'):
-#         name_pat = re.compile('name=\".*\"')
-#         self.M.select(folder)
-#         subjectSearch = "Whiteboard Image -- Application in progress --"
-#         resp, data = self.M.search(None, '(UNSEEN SUBJECT "%s")' % subjectSearch)
+# def get_attachments(self, folder='Inbox'):
+# name_pat = re.compile('name=\".*\"')
+# self.M.select(folder)
+# subjectSearch = "Whiteboard Image -- Application in progress --"
+# resp, data = self.M.search(None, '(UNSEEN SUBJECT "%s")' % subjectSearch)
 #
-#         counter = 0
-#         detach_dir = '.'
+# counter = 0
+# detach_dir = '.'
 #
-#         for num in data[0].split():
-#             resp, data = self.M.fetch(num, '(RFC822)')
-#             mail = email.message_from_string(data[0][1])
-#             # self.M.store(num, '+FLAGS', r'(\Deleted)')
-#             # walk through individual mails, looking for attachment of JPG type
-#             for part in mail.walk():
-#                 if part.is_multipart():
-#                     continue
-#                 if part.get_content_type() == 'text/plain':
-#                     body = "\n" + part.get_payload() + "\n"
+# for num in data[0].split():
+# resp, data = self.M.fetch(num, '(RFC822)')
+# mail = email.message_from_string(data[0][1])
+# # self.M.store(num, '+FLAGS', r'(\Deleted)')
+# # walk through individual mails, looking for attachment of JPG type
+# for part in mail.walk():
+# if part.is_multipart():
+# continue
+# if part.get_content_type() == 'text/plain':
+# body = "\n" + part.get_payload() + "\n"
 #
-#                 if part.get_content_maintype() != 'image':
-#                     continue
+# if part.get_content_maintype() != 'image':
+# continue
 #
-#                 file_type = part.get_content_type().split('/')[1]
+# file_type = part.get_content_type().split('/')[1]
 #
-#                 if not file_type:
-#                     file_type = 'jpg'
+# if not file_type:
+# file_type = 'jpg'
 #
-#                 filename = part.get_filename()
+# filename = part.get_filename()
 #
-#                 if not filename:
-#                     filename = name_pat.findall(part.get('Content-Type'))[0][6:-1]
+# if not filename:
+# filename = name_pat.findall(part.get('Content-Type'))[0][6:-1]
 #
-#                 print(filename)
+# print(filename)
 #
-#                 # PARSING BODY OF EMAIL
-#                 destFolder = albumHeader = ' '
-#                 if body:
-#                     word_list = body.split()
-#                     for i in range(len(word_list)):
-#                         if word_list[i] == 'DestFolder:':
+# # PARSING BODY OF EMAIL
+# destFolder = albumHeader = ' '
+# if body:
+# word_list = body.split()
+# for i in range(len(word_list)):
+# if word_list[i] == 'DestFolder:':
 #                             tmpWord = word_list[i].split(":")
 #                             destFolder = tmpWord[1]
 #                         elif word_list[i] == 'AlbumHeader:':
@@ -165,9 +164,60 @@ from imapclient import IMAPClient
 #     # if it's called INBOX, then…
 #     server.select("Inbox")
 #     pass
+import semidbm
 
-class Img():
+import os
+
+import jsonpickle
+import hashlib
+import time
+
+
+class ImgDB():
     def __init__(self):
+        if not os.path.exists('db/data'):
+            self.db = semidbm.open('db/', 'c')
+        else:
+            self.db = semidbm.open('db/', 'c')
+            self.dump()
+        # self.test()
+        pass
+
+    def test(self):
+        start = time.clock()
+        for mid in range(1, 20000):
+            midStr = str(mid)
+            ms = hashlib.sha1(midStr.encode()).hexdigest()
+            self.add(Img(ms))
+        self.db.close()
+        end = time.clock()
+        print('time', (end - start))
+        pass
+
+    def add(self, img):
+        try:
+            v = self.db[img.id]
+            print('id conflict')
+        except Exception:
+            self.db[img.id] = img.toJSON()
+            pass
+
+    def dump(self):
+        start = time.clock()
+        for img in self.db.values():
+            jstr = img.decode()
+            j = jsonpickle.decode(jstr)
+            print(j)
+        end = time.clock()
+        print('time', (end - start))
+
+
+class Img(object):
+    def __init__(self, id=None):
+        if id:
+            self.id = id
+        else:
+            self.id = '0'
         self.name = ''
         self.date = 0
         self.tags = []
@@ -175,10 +225,17 @@ class Img():
         self.width = 0
         self.height = 0
         self.size = 0
+        self.board = ''
+        #local attri
+        self.path = ''
         pass
 
+    def toJSON(self):
+        j = jsonpickle.encode(self)
+        return j
 
-class PhP2():
+
+class PinHE():
     def __init__(self):
         self.IMAP_SERVER = 'imap-mail.outlook.com'
         self.IMAP_PORT = 993

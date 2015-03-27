@@ -1,8 +1,6 @@
 from bottle import get, run, static_file, post, route, request, redirect
 import os
-from php import PhP2
-
-p = PhP2()
+from  conf import *
 
 
 @get('/')
@@ -16,6 +14,29 @@ def index():
 @post('/pin')
 def pin():
     pass
+
+
+@post('/set/info')
+def set_info():
+    id = request.get('id')
+    board = request.get('board')
+    pass
+
+
+@post('/upload')
+@post('/')
+def do_upload():
+    img = request.files['file']
+    chuck = img.file.read()
+    f2 = open(PHOTOS_PATH + img.filename, 'wb')
+    f2.write(chuck)
+    f2.close()
+    pass
+
+
+@get('/upload')
+def upload():
+    return static_file('upload.html', root='static')
 
 
 @route('/login', method=['POST', 'GET'])
@@ -64,5 +85,11 @@ def page():
     response.content_type = 'application/json'
     return dumps(rv)
 
+##############################
+from php import PinHE, ImgDB
+
+p = PinHE()
+# imgDB = ImgDB()
+####################################
 
 run(host='127.0.0.1', reloader=True)

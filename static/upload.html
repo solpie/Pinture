@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/css/u2.css">
+
+</head>
+<body>
+<div class="result">
+</div>
+<div id="dropbox">
+    <span class="message">Drag images here!</span>
+</div>
+
+<form id="upload" action="/" method="POST" enctype="multipart/form-data" target="ifm">
+    <fieldset>
+        <legend>File Upload:</legend>
+        <!--<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />-->
+        <div>
+            <!--<label for="fileselect">Files to upload:</label>-->
+            <input type="file" id="fileselect" name="file" title="choose a file">
+
+            <div id="filedrag">or drop the file here</div>
+        </div>
+    </fieldset>
+</form>
+<div id="upload_progress" class="progress progress-striped active" style="display:none">
+    <div id="upload_progress_bar" class="bar"></div>
+</div>
+ <script src="/js/jquery.js"></script>
+<script src="/js/jquery.filedrop.js"></script>
+<script src="/js/script.js"></script>
+
+</body>
+</html>
