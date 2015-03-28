@@ -1,6 +1,6 @@
 from bottle import get, run, static_file, post, route, request, redirect
 import os
-from  conf import *
+from conf import *
 
 
 @get('/')

@@ -5,6 +5,40 @@ import struct
 import imghdr
 
 
+def get_image_ext(fname):
+    fhandle = open(fname, 'rb')
+    head = fhandle.read(24)
+    if len(head) != 24:
+        return
+    if imghdr.what(fname) == 'png':
+        check = struct.unpack('>i', head[4:8])[0]
+        if check != 0x0d0a1a0a:
+            return
+        width, height = struct.unpack('>ii', head[16:24])
+    elif imghdr.what(fname) == 'gif':
+        width, height = struct.unpack('<HH', head[6:10])
+    elif imghdr.what(fname) == 'jpeg':
+        try:
+            fhandle.seek(0)  # Read 0xff next
+            size = 2
+            ftype = 0
+            while not 0xc0 <= ftype <= 0xcf:
+                fhandle.seek(size, 1)
+                byte = fhandle.read(1)
+                while ord(byte) == 0xff:
+                    byte = fhandle.read(1)
+                ftype = ord(byte)
+                size = struct.unpack('>H', fhandle.read(2))[0] - 2
+            # We are at a SOFn block
+            fhandle.seek(1, 1)  # Skip `precision' byte.
+            height, width = struct.unpack('>HH', fhandle.read(4))
+        except Exception:  # IGNORE:W0703
+            return
+    else:
+        return
+    return imghdr.what(fname)
+
+
 def get_image_size(fname):
     fhandle = open(fname, 'rb')
     head = fhandle.read(24)
@@ -127,33 +161,33 @@ from imapclient import IMAPClient
 # word_list = body.split()
 # for i in range(len(word_list)):
 # if word_list[i] == 'DestFolder:':
-#                             tmpWord = word_list[i].split(":")
-#                             destFolder = tmpWord[1]
-#                         elif word_list[i] == 'AlbumHeader:':
-#                             tmpWord = word_list[i].split(":")
-#                             folderFlag = word_list[i]
+# tmpWord = word_list[i].split(":")
+# destFolder = tmpWord[1]
+# elif word_list[i] == 'AlbumHeader:':
+# tmpWord = word_list[i].split(":")
+# folderFlag = word_list[i]
 #
 #
-#                 # download the attachments from email to the designated directory
-#                 att_path = os.path.join(detach_dir, filename)
+# # download the attachments from email to the designated directory
+# att_path = os.path.join(detach_dir, filename)
 #
-#                 # Check if its already there
-#                 if not os.path.isfile(att_path):
-#                     fp = open(att_path, 'wb')
-#                     temp = part.get_payload(decode=True)
-#                     fp.write(temp)
-#                     fp.close()
+# # Check if its already there
+# if not os.path.isfile(att_path):
+# fp = open(att_path, 'wb')
+# temp = part.get_payload(decode=True)
+# fp.write(temp)
+# fp.close()
 #
-#                 cmd = "chmod -R 755 ."
-#                 os.system(cmd)
+# cmd = "chmod -R 755 ."
+# os.system(cmd)
 #
-#                 counter = counter + 1
+# counter = counter + 1
 #
 
 #
 #
 # def rev():
-#     # you want to connect to a server; specify which server
+# # you want to connect to a server; specify which server
 #     server = imaplib.IMAP4_SSL('imap-mail.outlook.com')
 #     # after connecting, tell the server who you are
 #     server.login(acPixtch, pwPixtch)
@@ -269,8 +303,8 @@ class PinHE():
         s.ehlo()
         s.starttls()
         s.ehlo()
-        s.login(acPixtch, pwPixtch)
-        s.sendmail(acPixtch, acPixtch, msg.as_string())
+        s.login(self.ac, self.pw)
+        s.sendmail(self.ac, self.ac, msg.as_string())
         s.quit()
         pass
 
@@ -335,3 +369,47 @@ class PinHE():
     # p.login(acPixtch, pwPixtch)
     # print(p.response)
     # p.get_attachments()
+
+
+from urllib.request import urlretrieve
+import urllib
+from utils.md5 import md5_bytes
+from io import BytesIO
+
+
+def download(url):
+    user_agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1870.2 Safari/537.36'
+    headers = {'User-Agent': user_agent, "X-Requested-With": "XMLHttpRequest"}
+    req = urllib.request.Request(url, headers=headers)
+    res = urllib.request.urlopen(req)
+    if res.status == 200:
+        if not os.path.exists(PIN_PATH):
+            os.makedirs(PIN_PATH)
+        img_bytes = res.read()
+        md5_str = md5_bytes(img_bytes)
+        save_file_path = os.path.join(PIN_PATH, md5_str)
+        if os.path.exists(save_file_path):
+            print('存在:', save_file_path)
+        f = open(save_file_path, 'wb')
+        f.write(img_bytes)
+        f.close()
+
+    def _retrieve(url, filename, count=0):
+        if count > 10:
+            print('失败: 重试过10 次')
+        try:
+            if urlretrieve(url, filename):
+                print("下载:" + filename)
+            else:
+                print('失败:', filename)
+        except:
+            count += 1
+            print('ContentTooShortError: retry')
+            _retrieve(url, filename, count)
+            pass
+
+            # _retrieve(url, saveFilePath)
+
+
+# url = 'http://www.indiginus.com/sitebuilder/images/AGC_Remix_scr-422x243.jpg'
+# download(url)

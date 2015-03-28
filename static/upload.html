@@ -4,7 +4,31 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="/css/u2.css">
+    <style type="text/css">
+        #div1, #div2
+        {float:left; width:100px; height:35px; margin:10px;padding:10px;border:1px solid #aaaaaa;}
+    </style>
+    <script>
+        function allowDrop(ev)
+        {
+            ev.preventDefault();
+        }
 
+        function drag(ev)
+        {
+            ev.dataTransfer.setData("Url","http://www.google.fr");
+        }
+
+        function drop(ev)
+        {
+            ev.preventDefault();
+            window.location=ev.dataTransfer.getData("Url");
+        }
+
+    </script>
+    <script src="/js/jquery.js"></script>
+    <script src="/js/jquery.filedrop.js"></script>
+    <script src="/js/script.js"></script>
 </head>
 <body>
 <div class="result">
@@ -28,9 +52,10 @@
 <div id="upload_progress" class="progress progress-striped active" style="display:none">
     <div id="upload_progress_bar" class="bar"></div>
 </div>
- <script src="/js/jquery.js"></script>
-<script src="/js/jquery.filedrop.js"></script>
-<script src="/js/script.js"></script>
 
+
+<div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <img src="img_w3slogo.gif" draggable="true" ondragstart="drag(event)" id="drag1" width="88" height="31"></div>
+<div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
 </body>
 </html>
