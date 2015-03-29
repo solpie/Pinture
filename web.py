@@ -51,6 +51,19 @@ def login():
         return static_file('login.html', root='static')
 
 
+@get('/sel/<path>')
+def select(path):
+    path = 'Inbox'
+    p.select(path)
+    pass
+
+
+@get('/list')
+def list():
+    p.list()
+    pass
+
+
 @get('/js/<name>')
 def js(name):
     return static_file(name, root='static/js')
@@ -89,7 +102,12 @@ def page():
 from php import PinHE, ImgDB
 
 p = PinHE()
+#test
+
+# p.login(test_ac, test_pw)
+p.upload()
+# p.initPinture()
 # imgDB = ImgDB()
 ####################################
 
-run(host='127.0.0.1', reloader=True)
+# run(host='127.0.0.1', reloader=True)

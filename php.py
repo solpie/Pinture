@@ -188,16 +188,16 @@ from imapclient import IMAPClient
 #
 # def rev():
 # # you want to connect to a server; specify which server
-#     server = imaplib.IMAP4_SSL('imap-mail.outlook.com')
-#     # after connecting, tell the server who you are
-#     server.login(acPixtch, pwPixtch)
-#     # this will show you a list of available folders
-#     # possibly your Inbox is called INBOX, but check the list of mailboxes
-#     code, mailboxen = server.list()
-#     print(mailboxen)
-#     # if it's called INBOX, then…
-#     server.select("Inbox")
-#     pass
+# server = imaplib.IMAP4_SSL('imap-mail.outlook.com')
+# # after connecting, tell the server who you are
+# server.login(acPixtch, pwPixtch)
+# # this will show you a list of available folders
+# # possibly your Inbox is called INBOX, but check the list of mailboxes
+# code, mailboxen = server.list()
+# print(mailboxen)
+# # if it's called INBOX, then…
+# server.select("Inbox")
+# pass
 import semidbm
 
 import os
@@ -260,7 +260,7 @@ class Img(object):
         self.height = 0
         self.size = 0
         self.board = ''
-        #local attri
+        # local attri
         self.path = ''
         pass
 
@@ -271,41 +271,53 @@ class Img(object):
 
 class PinHE():
     def __init__(self):
-        self.IMAP_SERVER = 'imap-mail.outlook.com'
+        self.IMAP_SERVER = IMAP_163
         self.IMAP_PORT = 993
-        self.client = IMAPClient(host=self.IMAP_SERVER, ssl=True)
+        self.client = IMAPClient(host=self.IMAP_SERVER['url'], ssl=True)
         self.ac = ''
         self.pw = ''
+        self.has_pinture = False
         self._isLogin = False
         if debug_view:
             self._isLogin = True
         pass
 
     def upload(self):
-        img_width, img_height = get_image_size('y.png')
+        attachment = 'images/2.jpg'
+        img_width, img_height = get_image_size(attachment)
+        ext = get_image_ext(attachment)
+        md5_str = md5_bytes(open(attachment, 'rb').read())
+        if ext:
+            file_name = md5_str + '.' + ext
+        else:
+            raise Exception('unknown ext')
         msg = MIMEMultipart()
         msg['From'] = self.ac
         msg['To'] = self.ac
-        msg['Subject'] = "test2"
+        msg['Subject'] = "pinture"
+
+
         # msgText = MIMEText('<b>%s</b><br><img src="cid:bob.jpg"><br>' % body, 'html')
-        msgText = MIMEText('<img src="cid:y.jpg" width="%spx" height="%spx">' % (img_width, img_height), 'html')
+        msgText = MIMEText('<img src="cid:%s" width="%spx" height="%spx">' % (file_name, img_width, img_height), 'html')
         msg.attach(msgText)  # Added, and edited the previous line
 
-        attachment = 'y.jpg'
         fp = open(attachment, 'rb')
         img = MIMEImage(fp.read())
         fp.close()
 
-        img.add_header('Content-ID', attachment)
+        img.add_header('Content-ID', file_name)
         msg.attach(img)
-
-        s = smtplib.SMTP("smtp.live.com", 587)
-        s.ehlo()
-        s.starttls()
-        s.ehlo()
-        s.login(self.ac, self.pw)
-        s.sendmail(self.ac, self.ac, msg.as_string())
-        s.quit()
+        try:
+            s = smtplib.SMTP(SMTP_163)
+            # s.ehlo()
+            # s.starttls()
+            # s.ehlo()
+            s.login(self.ac, self.pw)
+            ret = s.sendmail(self.ac, self.ac, msg.as_string())
+            s.quit()
+            print('send sus', ret)
+        except Exception:
+            print('send failed!')
         pass
 
     def login(self, username, password):
@@ -313,7 +325,7 @@ class PinHE():
         self.pw = password
         ret = self.client.login(username, password)
         print(ret)
-        if ret[-12:] == b'successfully':
+        if ret == self.IMAP_SERVER['login_sus']:
             self._isLogin = True
             pass
         pass
@@ -322,17 +334,39 @@ class PinHE():
         return self._isLogin
 
     def select(self, folder='Inbox'):
-        state = self.client.select_folder(folder, readonly=True)
+        state = self.client.select_folder(folder.encode(), readonly=True)
         # result = self.client.search('UNSEEN')
         result = self.client.search('NOT DELETED')
+        print(result)
         # download
-        # msgdict = self.client.fetch(result, ['RFC822'])
-        # for message_id, message in msgdict.items():
-        # message_contents = message[b'RFC822'].decode('utf-8')
-        # e = email.message_from_string(message_contents)
-        # print(e)
-        #     self.walk(e)
+        msgdict = self.client.fetch(result, ['RFC822'])
+        for message_id, message in msgdict.items():
+            message_contents = message[b'RFC822'].decode('utf-8')
+            e = email.message_from_string(message_contents)
+            print(e)
+            self.walk(e)
         pass
+
+    def list(self):
+        folders = self.client.list_folders()
+        for f in folders:
+            name = f[2]
+            if name == 'pinture':
+                self.has_pinture = True
+            print(f)
+            pass
+        print(folders)
+
+    def initPinture(self):
+        self.list()
+        if self.has_pinture:
+            # todo upload all local images
+            self.select('pinture')
+            pass
+        else:
+            self.client.create_folder('pinture')
+        pass
+
 
     def walk(self, email):
         # walk through individual mails, looking for attachment of JPG type
@@ -411,5 +445,5 @@ def download(url):
             # _retrieve(url, saveFilePath)
 
 
-# url = 'http://www.indiginus.com/sitebuilder/images/AGC_Remix_scr-422x243.jpg'
-# download(url)
+            # url = 'http://www.indiginus.com/sitebuilder/images/AGC_Remix_scr-422x243.jpg'
+            # download(url)
