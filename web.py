@@ -99,9 +99,9 @@ def page():
     return dumps(rv)
 
 ##############################
-# from php import PinHE
+from php import PinHE
 #
-# p = PinHE()
+p = PinHE()
 # test
 
 # p.login(test_ac, test_pw)
