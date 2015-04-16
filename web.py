@@ -103,11 +103,13 @@ from php import PinHE
 #
 p = PinHE()
 # test
-
+from sys import argv
 # p.login(test_ac, test_pw)
 # p.upload()
 # p.initPinture()
 # imgDB = ImgDB()
 ####################################
-
-run(host='0.0.0.0', reloader=True)
+if len(argv) > 1:
+    run(host='0.0.0.0', port=argv[1])
+else:
+    run(host='127.0.0.1', reloader=True)
