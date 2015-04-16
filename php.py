@@ -80,9 +80,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 import smtplib
-import imaplib
 import re
-import os
 import email
 
 pattern_uid = re.compile('\d+ \(UID (?P<uid>\d+)\)')
@@ -416,7 +414,6 @@ class PinHE():
 from urllib.request import urlretrieve
 import urllib
 from utils.md5 import md5_bytes
-from io import BytesIO
 
 
 def download(url):
