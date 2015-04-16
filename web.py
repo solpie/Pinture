@@ -110,4 +110,4 @@ p = PinHE()
 # imgDB = ImgDB()
 ####################################
 
-# run(host='127.0.0.1', reloader=True)
+run(host='0.0.0.0', reloader=True)
