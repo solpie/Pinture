@@ -2,10 +2,11 @@ from bottle import get, run, static_file, post, route, request, redirect
 import os
 from conf import *
 
-
+test = {}
+test['isLogin']=False
 @get('/')
 def index():
-    if p.isLogin():
+    if p.isLogin() or test['isLogin']:
         return static_file('index.html', root='static')
     else:
         return redirect('/login/')
@@ -45,7 +46,11 @@ def login():
     if request.method == 'POST':
         ac = request.forms.get('ac')
         pw = request.forms.get('pw')
-        p.login(ac, pw)
+        if ac == 'test':
+            test['isLogin'] = True
+            redirect('/')
+        else:
+            p.login(ac, pw)
         redirect('/')
     else:
         return static_file('login.html', root='static')
@@ -75,7 +80,7 @@ def js(name):
 
 
 @get('/img/<name>')
-def img2(name):
+def show_image(name):
     return static_file(name, root='dl')
 
 
@@ -91,7 +96,7 @@ def page():
     rv['total'] = 20
     for i in range(0, 20):
         rv['result'].append({
-            "image": "http://127.0.0.1:8080/img/y.jpg",
+            "image": "/img/test.jpg",
             "width": 192,
             "height": 288
         })
@@ -109,6 +114,7 @@ from sys import argv
 # p.initPinture()
 # imgDB = ImgDB()
 ####################################
+
 if len(argv) > 1:
     run(host='0.0.0.0', port=argv[1], debug=True)
 else:

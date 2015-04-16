@@ -2,6 +2,5 @@
 test/*
 .idea/*
 images/*
-dl/*
 *.iml
 *.pyc
