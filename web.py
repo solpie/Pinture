@@ -99,13 +99,13 @@ def page():
     return dumps(rv)
 
 ##############################
-from php import PinHE, ImgDB
-
-p = PinHE()
-#test
+# from php import PinHE
+#
+# p = PinHE()
+# test
 
 # p.login(test_ac, test_pw)
-p.upload()
+# p.upload()
 # p.initPinture()
 # imgDB = ImgDB()
 ####################################

@@ -253,9 +253,10 @@ class Img(object):
         else:
             self.id = '0'
         self.name = ''
+        self.ref_name = ''  # 源文件名
+        self.ref_url = ''
         self.date = 0
         self.tags = []
-        self.ref = ''
         self.width = 0
         self.height = 0
         self.size = 0
@@ -282,7 +283,12 @@ class PinHE():
             self._isLogin = True
         pass
 
-    def upload(self):
+    def upload(self, imgObj=None):
+        if not imgObj:
+            imgObj = Img()
+            imgObj.tags=['2', '3', 'hair']
+            imgObj.board = '2'
+            pass
         attachment = 'images/2.jpg'
         img_width, img_height = get_image_size(attachment)
         ext = get_image_ext(attachment)
@@ -302,11 +308,13 @@ class PinHE():
         msg.attach(msgText)  # Added, and edited the previous line
 
         fp = open(attachment, 'rb')
-        img = MIMEImage(fp.read())
+        msgImg = MIMEImage(fp.read())
         fp.close()
-
-        img.add_header('Content-ID', file_name)
-        msg.attach(img)
+        msgImg.add_header('Content-ID', file_name)
+        tags = '#'.join(imgObj.tags)
+        msgImg.add_header('tags', tags)
+        msgImg.add_header('board', imgObj.board)
+        msg.attach(msgImg)
         try:
             s = smtplib.SMTP(SMTP_163)
             # s.ehlo()
