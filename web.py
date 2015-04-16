@@ -110,6 +110,6 @@ from sys import argv
 # imgDB = ImgDB()
 ####################################
 if len(argv) > 1:
-    run(host='0.0.0.0', port=argv[1])
+    run(host='0.0.0.0', port=argv[1], debug=True)
 else:
     run(host='127.0.0.1', reloader=True)
