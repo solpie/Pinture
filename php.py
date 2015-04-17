@@ -244,7 +244,7 @@ class ImgDB():
         print('time', (end - start))
 
 
-class Img(object):
+class Img():
     def __init__(self, id=None):
         if id:
             self.id = id
@@ -261,11 +261,16 @@ class Img(object):
         self.board = ''
         # local attri
         self.path = ''
+        self.refPath = ''
         pass
 
     def toJSON(self):
         j = jsonpickle.encode(self)
         return j
+
+    def createMeta(self, path):
+        self.width, self.height = get_image_size(path)
+        pass
 
 
 class PinHE():
@@ -284,7 +289,7 @@ class PinHE():
     def upload(self, imgObj=None):
         if not imgObj:
             imgObj = Img()
-            imgObj.tags=['2', '3', 'hair']
+            imgObj.tags = ['2', '3', 'hair']
             imgObj.board = '2'
             pass
         attachment = 'images/2.jpg'
@@ -372,7 +377,6 @@ class PinHE():
         else:
             self.client.create_folder('pinture')
         pass
-
 
     def walk(self, email):
         # walk through individual mails, looking for attachment of JPG type

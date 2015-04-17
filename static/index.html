@@ -3,48 +3,144 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Pin Hentai Pic</title>
+    <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/waterfall.css">
-    <style>
-        .item img { width: 192px;}
-    </style>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/jquery.js"></script>
+    <script src="/js/mustache.min.js"></script>
+    <script src="/js/imagesloaded.pkgd.min.js"></script>
+    <script src="/js/wookmark.min.js"></script>
 </head>
 <body>
-<script src="/js/handlebars.js"></script>
-<script src="/js/jquery.js"></script>
-<script src="/js/waterfall.js"></script>
-<script src="/js/mustache.js"></script>
-
-<div id="container"></div>
-<script type="text/x-handlebars-template" id="waterfall-tpl">
-{{#result}}
-    <div class="item">
-        <img src="{{image}}" width="{{width}}" height="{{height}}" />
+<div class="top">
+    tool bar
+</div>
+<div role="main">
+    <ul id="container" class="tiles-wrap animated">
+        <!-- These is where we place content loaded from the Wookmark API -->
+    </ul>
+    <div id="loader">
+        <div id="loaderCircle"></div>
     </div>
-{{/result}}
-</script>
-<script>
-$('#container').waterfall({
-    itemCls: 'item',
-    colWidth: 222,
-    gutterWidth: 15,
-    gutterHeight: 15,
-    checkImagesLoaded: false,
-    path: function(page) {
-        return 'page/?page=' + page;
-    },
-    callbacks: {
-        /*
-        * 处理ajax返回数方法
-        * @param {String} data
-        */
-       renderData: function (data) {
-           var template = $('#waterfall-tpl').html();
+</div>
 
-           return Mustache.to_html(template, data).replace(/^\s*/mg, '')
-       }
-    }
-});
+<script type="text/template" id="pin-tpl">
+    <li>
+        <a target="_blank" href="{{&image}}" title="undefined"/>
+        <img src="{{&image}}" width="250"/>
+
+        <p>undefined</p>
+    </li>
+</script>
+<script type="text/javascript">
+    (function ($) {
+        wookmark = undefined,
+                page = 1,
+                isLoading = false,
+                apiURL = '/page',
+                lastRequestTimestamp = 0,
+                fadeInDelay = 2000,
+                container = '#container',
+                $container = $(container),
+                $loaderCircle = $('#loaderCircle'),
+                $window = $(window),
+                $document = $(document);
+
+        /**
+         * When scrolled all the way to the bottom, add more tiles.
+         */
+        function onScroll(event) {
+            // Only check when we're not still waiting for data.
+            if (!isLoading) {
+                // Check if we're within 100 pixels of the bottom edge of the broser window.
+                var closeToBottom = ($window.scrollTop() + $window.height() > $document.height() - 100);
+                if (closeToBottom) {
+                    // Only allow requests every second
+                    var currentTime = new Date().getTime();
+                    if (lastRequestTimestamp < currentTime - 1000) {
+                        lastRequestTimestamp = currentTime;
+                        loadData();
+                    }
+                }
+            }
+        };
+        /**
+         * Refreshes the layout.
+         */
+        function applyLayout($newImages) {
+            $container.append($newImages);
+            imagesLoaded(container, function () {
+                // Destroy the old handler
+                if (wookmark === undefined) {
+                    wookmark = new Wookmark(container, {
+                        itemWidth: 250,
+                        offset: 15
+                    });
+                } else {
+                    wookmark.initItems();
+                    wookmark.layout(true);
+                }
+                // Set opacity for each new image at a random time
+                $newImages.each(function () {
+                    var $self = $(this);
+                    window.setTimeout(function () {
+                        $self.css('opacity', 1);
+                    }, Math.random() * fadeInDelay);
+                });
+            });
+        };
+        /**
+         * Loads data from the API.
+         */
+        function loadData() {
+            console.log('loadData');
+            isLoading = true;
+            $loaderCircle.show();
+            $.ajax({
+//                type: 'POST',
+                url: apiURL,
+//                dataType: 'jsonp', // 跨域 Set to jsonp if you use a server on a different domain and change it's setting accordingly
+                data: {page: page}, // Page parameter to make sure we load new data
+//                complete: onLoadData
+                success: onLoadData
+            });
+            console.log('ajax')
+        };
+        /**
+         * Receives data from the API, creates HTML for images and updates the layout
+         */
+        function onLoadData(response) {
+            console.log('onLoadData', response);
+//            if (response.status == 200) {
+            isLoading = false;
+            $loaderCircle.hide();
+            // Increment page index for future calls.
+            page++;
+            // Create HTML for the images.
+            var html = '',
+                    data = response,
+                    i = 0, length = data.length, image, opacity,
+                    $newImages;
+            console.log('rv', data);
+            var template = $('#pin-tpl').html();
+            for (; i < length; i++) {
+                html += Mustache.render(template, data[i]);
+            }
+            $newImages = html;
+            // Disable requests if we reached the end
+            if (response.message == 'No more pictures') {
+                $document.off('scroll', onScroll);
+            }
+            // Apply layout.
+            applyLayout($newImages);
+//            }
+        };
+        // Capture scroll event.
+        $document.on('scroll', onScroll);
+        // Load first data from the API.
+        loadData();
+    })(jQuery);
 </script>
 </body>
 </html>

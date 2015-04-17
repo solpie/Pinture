@@ -3,7 +3,9 @@ import os
 from conf import *
 
 test = {}
-test['isLogin']=False
+test['isLogin'] = False
+
+
 @get('/')
 def index():
     if p.isLogin() or test['isLogin']:
@@ -79,9 +81,10 @@ def js(name):
     return static_file(name, root='static/css')
 
 
-@get('/img/<name>')
-def show_image(name):
-    return static_file(name, root='dl')
+@get('/img/<name:path>')
+def img(name):
+    print(name)
+    return static_file(name, root='dl/')
 
 
 from bottle import response
@@ -89,17 +92,23 @@ from json import dumps
 # rv = [{ "id": 1, "name": "Test Item 1" }, { "id": 2, "name": "Test Item 2" }]
 # response.content_type = 'application/json'
 # return dumps(rv)
+
+
 @get('/page')
 @get('/page/')
 def page():
-    rv = {'total': 2, 'result': []}
-    rv['total'] = 20
-    for i in range(0, 20):
-        rv['result'].append({
-            "image": "/img/test.jpg",
-            "width": 192,
-            "height": 288
+    count = 20
+    rv = []
+    imgs = pt.getPage(count)
+    for i in imgs:
+        rv.append({
+            "image": "/img/" + i.refPath,
+            "srcw": i.width,
+            "srch": i.height,
+            "width": 250,
+            "height": int(i.height * 250 / i.width)
         })
+    response.status = 200
     response.content_type = 'application/json'
     return dumps(rv)
 
@@ -114,8 +123,11 @@ from sys import argv
 # p.initPinture()
 # imgDB = ImgDB()
 ####################################
+from pinture import Pinture
+
+pt = Pinture()
 
 if len(argv) > 1:
     run(host='0.0.0.0', port=argv[1], debug=True)
 else:
-    run(host='127.0.0.1', reloader=True)
+    run(host='127.0.0.1', reloader=True, debug=True)
