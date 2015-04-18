@@ -9,7 +9,7 @@ from random import randint
 
 class Pinture():
     def __init__(self):
-        self.imagePath = 'dl\\'
+        self.imagePath = os.path.normpath('dl\\')
         self.images = []
         self.updateImage()
         pass
@@ -21,7 +21,7 @@ class Pinture():
                 filename = os.path.join(root, filespath)
                 img = Img()
                 img.path = filename
-                img.refPath = filename.replace(self.imagePath, '').replace('\\','/')
+                img.refPath = filename.replace(self.imagePath, '').replace('\\', '/')
                 img.createMeta(filename)
                 self.images.append(img)
                 print('[load img]: ', filename)
