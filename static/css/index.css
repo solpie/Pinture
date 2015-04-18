@@ -37,7 +37,6 @@
     list-style-type: none;
     background-color: #fff;
     float: left;
-    cursor: pointer;
     width: 250px;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -76,6 +75,13 @@
 .pinRef {
     border-top: 1px solid #e7e7e7;
     height: 50px;
+    padding: 10px;
+}
+
+.pinRef a {
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .closeup-panel {
