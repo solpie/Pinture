@@ -4,18 +4,13 @@
     <meta charset="UTF-8">
     <title>Pin Hentai Pic</title>
     <link rel="stylesheet" href="/css/index.css">
-    <link rel="stylesheet" href="/css/magnific-popup.css">
     <link rel="stylesheet" href="/css/reset.css">
-    <link rel="stylesheet" href="/css/litebox.css">
     <link rel="stylesheet" href="/css/main.css">
-    <script src="/js/jquery.js"></script>
+    <script src="/js/jquery.min.js"></script>
     <script src="/js/mustache.min.js"></script>
-    <script src="/js/litebox.js"></script>
     <script src="/js/imagesloaded.pkgd.min.js"></script>
-    <!--<script src="/js/images-loaded.min.js"></script>-->
     <script src="/js/wookmark.min.js"></script>
-    <script src="/js/jquery.magnific-popup.min.js"></script>
-    <script src="/js/index.js"></script>
+    <script src="/js/layout.js"></script>
 </head>
 <body>
 <div class="top">
@@ -30,54 +25,53 @@
     </div>
 </div>
 
+<div class="closeup"></div>
+<script type="text/template" id="closeup-tpl">
+    <div class="closeup-panel">
+        <div class="closeup-con">
+            <div class="closeup-img">
+                <div class="closeup-tool"></div>
+                <img src="{{&img}}" width="800" alt="Image 001"/>
+            </div>
+            <div class="closeup-sidebar">sb</div>
+        </div>
+    </div>
+</script>
 <script type="text/template" id="pin-tpl">
     {{#image}}
     <li>
-        <a href="{{&image}}" target="_self" class="litebox">
-            <img src="{{&image}}" width="250"/>
+        <a href="{{&image}}" data-img="{{&image}}">
+            <img src="{{&image}}" width="250" alt="Image 001"/>
         </a>
 
-        <p>undefined</p>
-
+        <div class="pinMeta">
+            <p>{{desc}} <br>{{sw}} x {{sh}}</p>
+        </div>
         <div class="pinRef"></div>
-
     </li>
     {{/image}}
 </script>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#container').magnificPopup({
-            delegate: 'li:not(.inactive) a',
-            type: 'image',
-            gallery: {
-                enabled: true
-            }
+        var closeup = $('.closeup');
+        closeup.delegate('.closeup-panel', 'click', function (e) {
+            var closeupBg = $('.closeup-panel');
+            $('body').css('overflow', 'auto');
+            closeupBg.remove();
         });
-//        $('.litebox').liteBox({
-//            revealSpeed: 400,
-//            background: 'rgba(0,0,0,.8)',
-//            overlayClose: true,
-//            escKey: true,
-//            navKey: true,
-//            callbackInit: function () {
-//            },
-//            callbackBeforeOpen: function () {
-//            },
-//            callbackAfterOpen: function () {
-//            },
-//            callbackBeforeClose: function () {
-//            },
-//            callbackAfterClose: function () {
-//            },
-//            callbackError: function () {
-//            },
-//            callbackPrev: function () {
-//            },
-//            callbackNext: function () {
-//            },
-//            errorMessage: 'Error loading content.'
-//        });
-        console.log('ready')
+
+        $('ul').delegate('a', 'click', function (e) {
+            $('body').css('overflow', 'hidden');
+            e.preventDefault();
+            var tpl = $('#closeup-tpl').html();
+            var html = Mustache.render(tpl, {img: $(this).data('img')});
+            $('.closeup').append(html);
+            var closeupcon = $(".closeup-con");
+            var left = parseInt(( ($(document).width() - closeupcon.width()) / 2 ));
+            closeupcon.css('margin-left', left);
+            console.log('click', left);
+        });
+        console.log('ready');
     });
 </script>
 </body>

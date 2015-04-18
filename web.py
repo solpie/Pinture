@@ -103,8 +103,9 @@ def page():
     for i in imgs:
         rv.append({
             "image": "/img/" + i.refPath,
-            "srcw": i.width,
-            "srch": i.height,
+            "desc": 'desc...',
+            "sw": i.width,
+            "sh": i.height,
             "width": 250,
             "height": int(i.height * 250 / i.width)
         })
