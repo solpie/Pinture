@@ -102,7 +102,7 @@ def page():
     imgs = pt.getPage(count)
     for i in imgs:
         rv.append({
-            "image": "/img/" + i.refPath,
+            "image": "/img"+ i.refPath,
             "desc": 'desc...',
             "sw": i.width,
             "sh": i.height,
