@@ -6,7 +6,6 @@ from php import Img
 
 from random import randint
 
-
 class Pinture():
     def __init__(self):
         self.imagePath = os.path.normpath('dl/')
