@@ -1,6 +1,7 @@
 from bottle import get, run, static_file, post, route, request, redirect
 import os
 from conf import *
+import urllib
 
 test = {}
 test['isLogin'] = False
@@ -83,8 +84,26 @@ def js(name):
 
 @get('/img/<name:path>')
 def img(name):
-    print(name)
-    return static_file(name, root='dl/')
+    ref = request.query.ref
+
+    if ref == '1':
+        url = 'http://imglf1.ph.126.net/-Vn1I1WEUk7cYdTRx54ZyQ==/6630711523931898784.png'
+        user_agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1870.2 Safari/537.36'
+        headers = {'User-Agent': user_agent}
+        req = urllib.request.Request(url, headers=headers)
+        res = urllib.request.urlopen(req)
+        #todo local img server
+        # f = open('test.jpg', 'wb')
+        # f.write(res.read())
+        # f.close()
+        response.set_header('Content-type', 'image/jpeg')
+        # urllib.request.urlretrieve(url, 'ts1.png')
+        return res.read()
+        pass
+    else:
+        print(name)
+        return static_file(name, root='dl/')
+    # return
 
 
 from bottle import response
@@ -102,7 +121,7 @@ def page():
     imgs = pt.getPage(count)
     for i in imgs:
         rv.append({
-            "image": "/img"+ i.refPath,
+            "image": "/img" + i.refPath,
             "desc": 'desc...',
             "sw": i.width,
             "sh": i.height,

@@ -79,6 +79,7 @@ from conf import *
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from email.message import Message
 import smtplib
 import re
 import email
@@ -201,6 +202,7 @@ import semidbm
 import os
 
 import jsonpickle
+import json
 import hashlib
 import time
 
@@ -286,6 +288,51 @@ class PinHE():
             self._isLogin = True
         pass
 
+    def getMuLo(self, folder='MuLo'):
+        state = self.client.select_folder(folder.encode(), readonly=True)
+        # result = self.client.search('UNSEEN')
+        result = self.client.search('NOT DELETED')
+        print(result)
+
+        msgdict = self.client.fetch(result, ['RFC822'])
+        for message_id, message in msgdict.items():
+            message_contents = message[b'RFC822'].decode('utf-8')
+            e = email.message_from_string(message_contents)
+            print(e)
+            self.walkMuLo(e)
+        pass
+
+    def walkMuLo(self, email):
+        # part email.message.Message
+        msg = Message()
+        msg.get_payload()
+        for message in email.walk():
+            if message.is_multipart():
+                continue
+            payload = message.get_payload()
+            data = json.loads(payload)
+            print(data['text'])
+        pass
+
+    def sendMuLo(self, data, email):
+        title = data['title']
+        msg = MIMEMultipart()
+        msg['From'] = "MuLo"
+        msg['To'] = email
+        msg['Subject'] = title
+        muloData = json.dumps(data)
+        msgText = MIMEText(muloData)
+        msg.attach(msgText)
+        try:
+            s = smtplib.SMTP(SMTP_163)
+            s.login(self.ac, self.pw)
+            ret = s.sendmail(self.ac, self.ac, msg.as_string())
+            s.quit()
+            print('send sus', ret)
+        except Exception:
+            print('send failed!')
+        pass
+
     def upload(self, imgObj=None):
         if not imgObj:
             imgObj = Img()
@@ -304,8 +351,6 @@ class PinHE():
         msg['From'] = self.ac
         msg['To'] = self.ac
         msg['Subject'] = "pinture"
-
-
         # msgText = MIMEText('<b>%s</b><br><img src="cid:bob.jpg"><br>' % body, 'html')
         msgText = MIMEText('<img src="cid:%s" width="%spx" height="%spx">' % (file_name, img_width, img_height), 'html')
         msg.attach(msgText)  # Added, and edited the previous line
@@ -320,9 +365,6 @@ class PinHE():
         msg.attach(msgImg)
         try:
             s = smtplib.SMTP(SMTP_163)
-            # s.ehlo()
-            # s.starttls()
-            # s.ehlo()
             s.login(self.ac, self.pw)
             ret = s.sendmail(self.ac, self.ac, msg.as_string())
             s.quit()

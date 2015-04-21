@@ -5,24 +5,27 @@
     <title></title>
     <link rel="stylesheet" href="/css/u2.css">
     <style type="text/css">
-        #div1, #div2
-        {float:left; width:100px; height:35px; margin:10px;padding:10px;border:1px solid #aaaaaa;}
+        #div1, #div2 {
+            float: left;
+            width: 100px;
+            height: 35px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+        }
     </style>
     <script>
-        function allowDrop(ev)
-        {
+        function allowDrop(ev) {
             ev.preventDefault();
         }
 
-        function drag(ev)
-        {
-            ev.dataTransfer.setData("Url","http://www.google.fr");
+        function drag(ev) {
+            ev.dataTransfer.setData("Url", "http://www.google.fr");
         }
 
-        function drop(ev)
-        {
+        function drop(ev) {
             ev.preventDefault();
-            window.location=ev.dataTransfer.getData("Url");
+            window.location = ev.dataTransfer.getData("Url");
         }
 
     </script>
@@ -57,5 +60,8 @@
 <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
     <img src="img_w3slogo.gif" draggable="true" ondragstart="drag(event)" id="drag1" width="88" height="31"></div>
 <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+<div class="test">
+    <img src="http://imglf1.ph.126.net/-Vn1I1WEUk7cYdTRx54ZyQ==/6630711523931898784.png">
+</div>
 </body>
 </html>
