@@ -1,0 +1,22 @@
+{
+  "name": "Pintu Button",
+  "description": "Pintu Button",
+  "version": "0.0",
+  "minimum_chrome_version": "16.0.884",
+  "permissions": [
+    "downloads",
+    "<all_urls>"
+  ],
+  "browser_action": {"default_popup": "popup.html"},
+  "content_scripts": [
+    {
+      "matches": ["*://huaban.com/bookmarklet/*"],
+      "css": ["pintu.css"],
+      "js": [
+        "jquery.js",
+        "pintu.js"
+      ]
+    }
+  ],
+  "manifest_version": 2
+}
