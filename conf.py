@@ -6,6 +6,6 @@ PIN_PATH = 'images/pin/'
 
 IMAP_163 = {'url': 'imap.163.com', 'login_sus': b'LOGIN completed'}
 SRV_163 = {'url': 'imap.163.com', 'login_sus': b'LOGIN completed', 'smtp': 'smtp.163.com'}
-SRV_163 = {'url': 'imap-mail.outlook.com', 'login_sus': b'LOGIN completed', 'smtp': 'smtp.live.com'}
+IMAP_outlook = {'url': 'imap-mail.outlook.com', 'login_sus': b'LOGIN completed', 'smtp': 'smtp.live.com'}
 SMTP_163 = 'smtp.163.com'
-SMTP_OUT_LOOK = 'smtp.163.com'
+SMTP_OUT_LOOK = {'host': 'smtp.live.com', 'port': 587}

@@ -40,7 +40,12 @@ def do_upload():
 
 @get('/upload')
 def upload():
-    return static_file('upload.html', root='static')
+    url = request.query.url
+    if url:
+        p.sendImage(url)
+        pass
+    else:
+        return static_file('upload.html', root='static')
 
 
 @route('/login', method=['POST', 'GET'])
@@ -92,7 +97,7 @@ def img(name):
         headers = {'User-Agent': user_agent}
         req = urllib.request.Request(url, headers=headers)
         res = urllib.request.urlopen(req)
-        #todo local img server
+        # todo local img server
         # f = open('test.jpg', 'wb')
         # f.write(res.read())
         # f.close()
@@ -103,7 +108,7 @@ def img(name):
     else:
         print(name)
         return static_file(name, root='dl/')
-    # return
+        # return
 
 
 from bottle import response

@@ -23,6 +23,7 @@ $(function ($) {
         if (!isLoading) {
             // Check if we're within 100 pixels of the bottom edge of the broser window.
             var closeToBottom = ($window.scrollTop() + $window.height() > $document.height() - 100);
+            console.log($window.scrollTop(), $window.height());
             if (closeToBottom) {
                 // Only allow requests every second
                 var currentTime = new Date().getTime();

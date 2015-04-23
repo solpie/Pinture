@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="/css/u2.css">
+    <link rel="stylesheet" href="css/index.css">
     <style type="text/css">
         #div1, #div2 {
             float: left;
@@ -60,8 +61,14 @@
 <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
     <img src="img_w3slogo.gif" draggable="true" ondragstart="drag(event)" id="drag1" width="88" height="31"></div>
 <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-<div class="test">
-    <img src="http://imglf1.ph.126.net/-Vn1I1WEUk7cYdTRx54ZyQ==/6630711523931898784.png">
+<div class="tags">
+    <input id="tags_2" type="text" class="tags" value="php,ios,javascript,ruby,android,kindle" style="display: none;">
+    <div id="tags_2_tagsinput" class="tagsinput" style="width: auto; min-height: 100px;">
+    <span class="tag" style="background-color: darkred;">
+        <span>test&nbsp;&nbsp;</span>
+        <a href="#" title="Removing tag">x</a>
+    </span>
+    </div>
 </div>
 </body>
 </html>
